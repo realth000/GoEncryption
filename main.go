@@ -2,21 +2,25 @@ package main
 
 import (
 	"GoEncryption/encryption"
+	"encoding/hex"
 	"fmt"
 )
 
-func main() {
-	key, err := encryption.TestInitKey(encryption.AES256)
+const (
+	testKey = `148cd21bb34af8db7d410201de6ec019058cfa62daecf3b69c481b6248765252`
+)
 
-	c, err := encryption.Encrypt(key, "TestAbc123")
+func main() {
+	keyByte, _ := hex.DecodeString(testKey)
+	c, err := encryption.EncryptString("TestAbc123", encryption.AES256, keyByte)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	e, err := encryption.Decrypt(key, c)
+	p, err := encryption.Decrypt(c, encryption.AES256, keyByte)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%s\n", e)
+	fmt.Printf("\"%s\"\n", p)
 }
