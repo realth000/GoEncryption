@@ -1,6 +1,9 @@
 package encryption
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type CryptoType uint32
 
@@ -29,7 +32,7 @@ func MakeKey(t CryptoType) ([]byte, error) {
 	if t <= AES256 {
 		return makeAESKey(keyLengthAESMap[t])
 	}
-	return nil, errors.New(errorUnknownCryptoType)
+	return nil, errors.New(fmt.Sprintf("%s:%d", errorUnknownCryptoType, t))
 }
 
 func validateKey(t CryptoType, key []byte) error {
@@ -37,18 +40,18 @@ func validateKey(t CryptoType, key []byte) error {
 	switch t {
 	case AES128:
 		if len(key) != int(keyLengthAES128) {
-			err = errors.New(errorInvalidKeyLength)
+			err = errors.New(fmt.Sprintf("%s:%d", errorInvalidKeyLength, len(key)))
 		}
 	case AES192:
 		if len(key) != int(keyLengthAES192) {
-			err = errors.New(errorInvalidKeyLength)
+			err = errors.New(fmt.Sprintf("%s:%d", errorInvalidKeyLength, len(key)))
 		}
 	case AES256:
 		if len(key) != int(keyLengthAES256) {
-			err = errors.New(errorInvalidKeyLength)
+			err = errors.New(fmt.Sprintf("%s:%d", errorInvalidKeyLength, len(key)))
 		}
 	default:
-		err = errors.New(errorUnknownCryptoType)
+		err = errors.New(fmt.Sprintf("%s:%d", errorUnknownCryptoType, t))
 	}
 	return err
 }

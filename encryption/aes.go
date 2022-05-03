@@ -44,7 +44,7 @@ func encryptAES(data []byte, key []byte) ([]byte, error) {
 
 	data = addAESPadding(data)
 	if len(data)%aes.BlockSize != 0 {
-		return nil, errors.New("not regular plain text length")
+		return nil, errors.New(fmt.Sprintf("too short cipher text:len=%d", len(data)))
 	}
 
 	block, err := aes.NewCipher(key)
@@ -71,13 +71,13 @@ func decryptAES(data []byte, key []byte) ([]byte, error) {
 
 	if len(data) < aes.BlockSize {
 		fmt.Println(len(data))
-		return nil, errors.New("too short cipher text")
+		return nil, errors.New(fmt.Sprintf("too short cipher text:len=%d", len(data)))
 	}
 
 	iv := data[:aes.BlockSize]
 	data = data[aes.BlockSize:]
 	if len(data)%aes.BlockSize != 0 {
-		return nil, errors.New("not regular cipher text length")
+		return nil, errors.New(fmt.Sprintf("not regular cipher text length:len=%d", len(data)))
 	}
 
 	mode := cipher.NewCBCDecrypter(block, iv)

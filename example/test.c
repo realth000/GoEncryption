@@ -2,10 +2,10 @@
 #include <string.h>
 #include "libGoEncryption.h"
 
-GoSlice makeSlice(char *p) {
-	GoSlice ret = {(void*)*p, strlen(p), strlen(p)};
-	return ret;
-}
+//GoSlice makeSlice(char *p) {
+//	GoSlice ret = {(void*)*p, strlen(p), strlen(p)};
+//	return ret;
+//}
 
 //int main_back(int argc, char *argv[]) {
 //	printf("1 %d\n", argc);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
 	char *data = argv[1];
 	char *key = MakeAES256Key();
-
+	printf("data len=%ld key len=%ld\n", strlen(data), strlen(key));
 	char *c = GoEncrypt(data, key);
 	char *p = GoDecrypt(c, key);
 	printf("AES-256 result =%s\n", p);

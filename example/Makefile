@@ -6,7 +6,7 @@ GO_LIB_HEADER=libGoEncryption.h
 GO_LIB_ARCHIVE=libGoEncryption.a
 GO_LIB_SHARED=GoEncryption
 
-FLAGS=-fstack-protector-all -D_FORTIFY_SOURCE=2 -Wl,-z,now,-z,relro,-z,noexecstack -fPIC -s -pthread
+FLAGS=-Wall -O2 -fstack-protector-all -D_FORTIFY_SOURCE=2 -Wl,-z,now,-z,relro,-z,noexecstack -fPIC -s -pthread
 
 .PHONY: all
 all: with-archive with-shared
