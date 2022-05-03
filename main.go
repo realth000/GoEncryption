@@ -3,6 +3,7 @@ package main
 import (
 	"C"
 	"GoEncryption/encryption"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 )
@@ -11,31 +12,51 @@ const (
 	testKey = `148cd21bb34af8db7d410201de6ec019058cfa62daecf3b69c481b6248765252`
 )
 
-//export MakeAES256Key
-func MakeAES256Key() *C.char {
+func base64Encode(data []byte) []byte {
+	dst := make([]byte, base64.StdEncoding.EncodedLen(len(data)))
+	base64.StdEncoding.Encode(dst, data)
+	return dst
+}
+
+func base64Decode(data []byte) []byte {
+	dst := make([]byte, base64.StdEncoding.DecodedLen(len(data)))
+	n, err := base64.StdEncoding.Decode(dst, data)
+	if err != nil {
+		fmt.Printf("base64 decode error:%s(len=%d)\n", err, n)
+		return nil
+	}
+	return dst[:len(dst)-1]
+}
+
+//export MakeAES256KeyToBase64
+func MakeAES256KeyToBase64() *C.char {
 	key, err := encryption.MakeKey(encryption.AES256)
 	// TODO: Handle error.
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
+	key = base64Encode(key)
 	return C.CString(string(key))
 }
 
-//export GoEncrypt
-func GoEncrypt(data *C.char, keyByte *C.char) *C.char {
-	c, err := encryption.Encrypt([]byte(C.GoString(data)), encryption.AES256, []byte(C.GoString(keyByte)))
+//export GoEncryptToBase64
+func GoEncryptToBase64(data *C.char, key *C.char) *C.char {
+	keyRaw := base64Decode([]byte(C.GoString(key)))
+	c, err := encryption.Encrypt([]byte(C.GoString(data)), encryption.AES256, keyRaw)
 	// TODO: Handle error.
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	return C.CString(string(c))
+	return C.CString(string(base64Encode(c)))
 }
 
-//export GoDecrypt
-func GoDecrypt(data *C.char, keyByte *C.char) *C.char {
-	p, err := encryption.Decrypt([]byte(C.GoString(data)), encryption.AES256, []byte(C.GoString(keyByte)))
+//export GoDecryptToBase64
+func GoDecryptToBase64(data *C.char, key *C.char) *C.char {
+	keyRaw := base64Decode([]byte(C.GoString(key)))
+	dataRaw := base64Decode([]byte(C.GoString(data)))
+	p, err := encryption.Decrypt(dataRaw, encryption.AES256, keyRaw)
 	// TODO: Handle error.
 	if err != nil {
 		fmt.Println(err)
