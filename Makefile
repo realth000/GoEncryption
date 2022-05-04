@@ -1,4 +1,5 @@
 SOURCE=main.go
+SOURCE_DIR_EXAMPLE=example
 TARGET_C_ARCHIVE=libGoEncryption.a
 TARGET_C_SHARED=libGoEncryption.so
 TARGET_C_HEADER=libGoEncryption.h
@@ -12,7 +13,7 @@ export CGO_CFLAGS=$(GO_FLAGS)
 export CGO_CXXFLAGS=$(GO_FLAGS)
 
 .PHONY: all
-all: c-archive c-shared
+all: c-archive c-shared example
 
 .PHONY: c-header
 c-header:
@@ -27,6 +28,12 @@ c-archive:
 c-shared:
 	$(GO_CMD) build -buildmode=c-shared -trimpath -ldflags $(GO_LDFLAGS) -o $(TARGET_C_SHARED) $(SOURCE)
 
+.PHONY: example
+example: c-archive c-shared
+	cp -f $(TARGET_C_HEADER) $(TARGET_C_ARCHIVE) $(TARGET_C_SHARED) $(SOURCE_DIR_EXAMPLE)
+	$(MAKE) -C $(SOURCE_DIR_EXAMPLE)
+
 .PHONY: clean
 clean:
 	$(RM) $(TARGET_C_HEADER) $(TARGET_C_ARCHIVE) $(TARGET_C_SHARED)
+	$(MAKE) clean -C example
